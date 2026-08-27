@@ -1,34 +1,21 @@
 import { useEffect, useRef, useState } from 'react'
+import { motion, useInView, animate } from 'framer-motion'
+
+const EASE = [0.16, 1, 0.3, 1]
 
 export function Reveal({ as: Tag = 'div', delay = 0, className = '', children, ...rest }) {
-  const ref = useRef(null)
-  const [visible, setVisible] = useState(false)
-
-  useEffect(() => {
-    const el = ref.current
-    if (!el) return
-    const io = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setVisible(true)
-          io.disconnect()
-        }
-      },
-      { threshold: 0.15, rootMargin: '0px 0px -40px 0px' }
-    )
-    io.observe(el)
-    return () => io.disconnect()
-  }, [])
-
+  const MotionTag = motion.create(Tag)
   return (
-    <Tag
-      ref={ref}
-      className={`reveal ${visible ? 'is-visible' : ''} ${className}`}
-      style={{ transitionDelay: `${delay}ms` }}
+    <MotionTag
+      className={className}
+      initial={{ opacity: 0, y: 26 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: '0px 0px -40px 0px' }}
+      transition={{ duration: 0.7, delay: delay / 1000, ease: EASE }}
       {...rest}
     >
       {children}
-    </Tag>
+    </MotionTag>
   )
 }
 
@@ -39,13 +26,15 @@ function LetterSplit({ text, delay = 0 }) {
       {words.map((word, wi) => (
         <span className="word" key={`${word}-${wi}`} aria-hidden={wi > 0}>
           {word.split('').map((letter, li) => (
-            <span
+            <motion.span
               className="letter"
               key={`${letter}-${li}`}
-              style={{ animationDelay: `${delay + wi * 90 + li * 22}ms` }}
+              initial={{ y: '110%' }}
+              animate={{ y: 0 }}
+              transition={{ duration: 0.7, delay: (delay + wi * 90 + li * 22) / 1000, ease: EASE }}
             >
               {letter}
-            </span>
+            </motion.span>
           ))}
         </span>
       ))}
@@ -61,40 +50,20 @@ export function SplitTitle({ text, className = '', delay = 0 }) {
   )
 }
 
-export function CountUp({ end, suffix = '', duration = 1600 }) {
+export function CountUp({ end, suffix = '', duration = 1.6 }) {
   const ref = useRef(null)
+  const inView = useInView(ref, { once: true, amount: 0.4 })
   const [value, setValue] = useState(0)
-  const [started, setStarted] = useState(false)
 
   useEffect(() => {
-    const el = ref.current
-    if (!el) return
-    const io = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setStarted(true)
-          io.disconnect()
-        }
-      },
-      { threshold: 0.4 }
-    )
-    io.observe(el)
-    return () => io.disconnect()
-  }, [])
-
-  useEffect(() => {
-    if (!started) return
-    let raf
-    const start = performance.now()
-    const tick = (now) => {
-      const t = Math.min(1, (now - start) / duration)
-      const eased = 1 - Math.pow(1 - t, 3)
-      setValue(Math.round(eased * end))
-      if (t < 1) raf = requestAnimationFrame(tick)
-    }
-    raf = requestAnimationFrame(tick)
-    return () => cancelAnimationFrame(raf)
-  }, [started, end, duration])
+    if (!inView) return
+    const controls = animate(0, end, {
+      duration,
+      ease: EASE,
+      onUpdate: (v) => setValue(Math.round(v))
+    })
+    return () => controls.stop()
+  }, [inView, end, duration])
 
   return (
     <span ref={ref}>
@@ -104,9 +73,9 @@ export function CountUp({ end, suffix = '', duration = 1600 }) {
   )
 }
 
-export function Eyebrow({ num, label, dark = false }) {
+export function Eyebrow({ num, label }) {
   return (
-    <span className={`eyebrow ${dark ? '' : ''}`}>
+    <span className="eyebrow">
       <span className="num">{num}</span>
       {label && (
         <>
@@ -118,7 +87,7 @@ export function Eyebrow({ num, label, dark = false }) {
   )
 }
 
-export function ArrowLink({ to, children, dark = false }) {
+export function ArrowLink({ to, children }) {
   return (
     <a href={to} className="arrow-link">
       {children}

@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { AnimatePresence, motion } from 'framer-motion'
 import { Link } from 'react-router-dom'
 import {
   automateAreas, steps, techTags, stats, caseStudy, industries,
@@ -324,15 +325,25 @@ function Testimonials() {
             </div>
           </Reveal>
           <Reveal delay={80} className="quote-card">
-            <p className="quote">“{t.quote}”</p>
-            <div className="person">
-              <span className="avatar">{t.initials}</span>
-              <span className="meta">
-                <span className="name">{t.name}</span>
-                <br />
-                <span className="role">{t.role}</span>
-              </span>
-            </div>
+            <AnimatePresence mode="wait" initial={false}>
+              <motion.div
+                key={idx}
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -16 }}
+                transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+              >
+                <p className="quote">“{t.quote}”</p>
+                <div className="person">
+                  <span className="avatar">{t.initials}</span>
+                  <span className="meta">
+                    <span className="name">{t.name}</span>
+                    <br />
+                    <span className="role">{t.role}</span>
+                  </span>
+                </div>
+              </motion.div>
+            </AnimatePresence>
             <div className="controls">
               <div className="dots-nav">
                 {testimonials.map((_, i) => (

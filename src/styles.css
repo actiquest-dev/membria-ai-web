@@ -382,13 +382,6 @@ ul {
 }
 .hero-title .letter {
   display: inline-block;
-  transform: translateY(110%);
-  animation: rise 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-}
-@keyframes rise {
-  to {
-    transform: translateY(0);
-  }
 }
 .hero-actions {
   display: flex;
@@ -1131,27 +1124,9 @@ ul {
   opacity: 0.16;
 }
 
-/* ===== Reveal ===== */
-.reveal {
-  opacity: 0;
-  transform: translateY(26px);
-  transition: opacity 0.7s ease, transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
-}
-.reveal.is-visible {
-  opacity: 1;
-  transform: translateY(0);
-}
+/* ===== Reveal (via Framer Motion whileInView) ===== */
 @media (prefers-reduced-motion: reduce) {
-  .reveal {
-    opacity: 1;
-    transform: none;
-    transition: none;
-  }
   .marquee-track {
-    animation: none;
-  }
-  .hero-title .letter {
-    transform: none;
     animation: none;
   }
 }
