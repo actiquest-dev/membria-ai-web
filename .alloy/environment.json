@@ -1,5 +1,5 @@
 {
   "dockerComposePath": "docker-compose.alloy.yaml",
-  "frontendPort": 3000,
-  "homeUrl": "/oberon-framer-website.html"
+  "frontendPort": 5173,
+  "homeUrl": "/"
 }
